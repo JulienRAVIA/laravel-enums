@@ -3,11 +3,14 @@
 namespace Nasyrov\Laravel\Enums;
 
 use BadMethodCallException;
+use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Nasyrov\Laravel\Enums\Casts\EnumCast;
 use ReflectionClass;
 use UnexpectedValueException;
 use JsonSerializable;
 
-abstract class Enum implements JsonSerializable
+abstract class Enum implements JsonSerializable, Castable
 {
     /**
      * The enum value.
@@ -15,6 +18,10 @@ abstract class Enum implements JsonSerializable
      * @var mixed
      */
     protected $value;
+
+    protected $label;
+
+    protected $key;
 
     /**
      * The enum constants.
@@ -39,6 +46,8 @@ abstract class Enum implements JsonSerializable
         }
 
         $this->value = $value;
+        $this->label = static::guessLabel($value);
+        $this->key = $this->getKey();
     }
 
     /**
@@ -46,7 +55,7 @@ abstract class Enum implements JsonSerializable
      */
     public function __toString()
     {
-        return (string)$this->value;
+        return (string) $this->value;
     }
 
     /**
@@ -140,5 +149,47 @@ abstract class Enum implements JsonSerializable
             $name,
             static::class
         ));
+    }
+
+    public function __get($key)
+    {
+        return property_exists(static::class, $key) ? $this->$key : null;
+    }
+
+    /**
+     * @return array<string>
+     */
+    public static function labels(): array
+    {
+        return static::constants()
+            ->flip()
+            ->map(function ($key) {
+                return $key;
+            })
+            ->all()
+        ;
+    }
+
+    /**
+     * @param $value
+     * @return mixed|null
+     */
+    public static function guessLabel($value)
+    {
+        return static::labels()[$value] ?? null;
+    }
+
+    /**
+     * @param array $arguments
+     * @return CastsAttributes
+     */
+    public static function castUsing(array $arguments): CastsAttributes
+    {
+        return new EnumCast(static::class, ...$arguments);
+    }
+
+    public function getLabel()
+    {
+        return $this->label;
     }
 }
