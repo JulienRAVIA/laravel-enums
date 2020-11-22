@@ -21,10 +21,6 @@ class EnumRule extends Rule
 
     public function __construct(string $enum)
     {
-        if (new $enum instanceof Enum) {
-            throw NotEnumClass::make();
-        }
-
         $this->enum = $enum;
     }
 
