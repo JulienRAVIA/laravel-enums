@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Nasyrov\Laravel\Enums\Enum;
 use Nasyrov\Laravel\Enums\Exceptions\NotHandleNull;
 
+/**
+ * This is a simple port of spatie/laravel-enum casts
+ *
+ * @author Julien RAVIA <julien.ravia@gmail.com>
+ * @author Spatie <https://github.com/spatie>
+ * @link https://github.com/spatie/laravel-enum
+ */
 abstract class Cast implements CastsAttributes
 {
     /** @var string|Enum */

@@ -2,6 +2,7 @@
 
 namespace Nasyrov\Laravel\Enums\Casts;
 
+use Illuminate\Support\Arr;
 use Nasyrov\Laravel\Enums\Enum;
 use Nasyrov\Laravel\Enums\Exceptions\NotHandleNull;
 
@@ -12,15 +13,15 @@ use Nasyrov\Laravel\Enums\Exceptions\NotHandleNull;
  * @author Spatie <https://github.com/spatie>
  * @link https://github.com/spatie/laravel-enum
  */
-class EnumCast extends Cast
+class EnumCastCollection extends Cast
 {
     /**
      * @param \Illuminate\Database\Eloquent\Model $model
      * @param string $key
-     * @param int|string|null|mixed $value
+     * @param string|null|mixed $value
      * @param array $attributes
      *
-     * @return Enum|null
+     * @return Enum[]|null
      *
      * @throws \BadMethodCallException
      * @throws NotHandleNull
@@ -31,19 +32,18 @@ class EnumCast extends Cast
             return $this->handleNullValue($model, $key);
         }
 
-        return $this->asEnum($value);
+        return $this->asEnums(
+            Arr::wrap(json_decode($value, true))
+        );
     }
 
     /**
      * @param \Illuminate\Database\Eloquent\Model $model
      * @param string $key
-     * @param int|string|Enum|null|mixed $value
+     * @param int[]|string[]|\Spatie\Enum\Enum[]|null|mixed $value
      * @param array $attributes
      *
-     * @return int|string|null
-     *
-     * @throws \BadMethodCallException
-     * @throws NotHandleNull
+     * @return string|null
      */
     public function set($model, string $key, $value, array $attributes)
     {
@@ -51,6 +51,19 @@ class EnumCast extends Cast
             return $this->handleNullValue($model, $key);
         }
 
-        return $this->asEnum($value)->value;
+        return json_encode($this->asEnums(Arr::wrap($value)));
+    }
+
+    /**
+     * @param int[]|string[]|Enum[] $values
+     *
+     * @return Enum
+     *
+     * @throws \TypeError
+     * @throws \BadMethodCallException
+     */
+    protected function asEnums(array $values): array
+    {
+        return array_map([$this, 'asEnum'], $values);
     }
 }

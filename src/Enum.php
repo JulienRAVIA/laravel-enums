@@ -10,6 +10,11 @@ use ReflectionClass;
 use UnexpectedValueException;
 use JsonSerializable;
 
+/**
+ * @author Julien RAVIA <julien.ravia@gmail.com>
+ * @author Evgenii Nasyrov <https://github.com/nasyrov>
+ * @link https://github.com/nasyrov/laravel-enums
+ */
 abstract class Enum implements JsonSerializable, Castable
 {
     /**
